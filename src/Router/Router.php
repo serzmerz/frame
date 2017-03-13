@@ -2,8 +2,10 @@
 
 namespace serz\Framework\Router;
 
+use serz\Framework\Request\Request;
 use serz\Framework\Router\Exceptions\InvalidRouteArgumentException;
 use serz\Framework\Router\Exceptions\InvalidRouteNameException;
+use serz\Framework\Router\Exceptions\RouteNotFoundException;
 
 
 /**
@@ -31,7 +33,7 @@ class Router
             $existed_params = $this->getParams($value);
             $this->routes[$key] = [
                 "pattern" => $value["pattern"],
-                "method" => empty($value["method"]) ? $value["method"] : "GET",
+                "method" => isset($value["method"]) ? $value["method"] : "GET",
                 "controller_name" => $this->getRouteController($value),
                 "controller_action" => $this->getRouteMethod($value),
                 "regexp" => $this->getRegExp($value, $existed_params),
@@ -42,11 +44,39 @@ class Router
         debug($this->routes);
     }
 
-    /*    public function getRoute(Request $request): Route
-        {
-            return new Route();
+    /**
+     * Create route with variables
+     * @param Request $request
+     * @return Route
+     * @throws RouteNotFoundException
+     */
+    public function getRoute(Request $request): Route
+    {
+        $uri = $request->getUri();
+
+        foreach ($this->routes as $key => $value) {
+
+            if ($value['method'] == $request->getMethod()) {
+                if (preg_match_all($value['regexp'], $uri, $matches)) {
+
+                    $result = new Route($key, $value['controller_name'], $value['controller_action']);
+
+                    if (!empty($value['params'])) {
+
+                        $variables = array_pop($matches);
+                        $variables_array = [];
+                        for ($i = 0; $i < count($value['params']); $i++) {
+                            $variables_array[$value['params'][$i]] = $variables[$i];
+                        }
+                        $result->setVariables($variables_array);
+                    }
+
+                    return $result;
+                }
+            }
         }
-      */
+        throw new RouteNotFoundException("Route not found!");
+    }
 
 
     /**
@@ -57,8 +87,7 @@ class Router
     private function getRouteController(array $value): string
     {
         $result = explode("@", $value["action"]);
-        $result = array_shift($result);
-        return $result;
+        return array_shift($result);
     }
 
     /**
@@ -69,8 +98,7 @@ class Router
     private function getRouteMethod(array $value): string
     {
         $result = explode("@", $value["action"]);
-        $result = array_pop($result);
-        return $result;
+        return array_pop($result);
     }
 
     /**

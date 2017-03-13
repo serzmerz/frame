@@ -2,8 +2,10 @@
 
 namespace serz\Framework;
 
+use serz\Framework\Request\Request;
 use serz\Framework\Router\Exceptions\InvalidRouteArgumentException;
 use serz\Framework\Router\Exceptions\InvalidRouteNameException;
+use serz\Framework\Router\Exceptions\RouteNotFoundException;
 use serz\Framework\Router\Router;
 
 /**
@@ -33,15 +35,21 @@ class Application
      */
     public function start()
     {
-        try{
+        try {
+
             $router = new Router($this->config['routes']);
 
-            debug($router->getLink("single_product",["id" =>3]));
-        }
-        catch (InvalidRouteNameException $e){
+            $request = Request::getRequest();
+
+            $route = $router->getRoute($request);
+
+            // debug($router->getLink("single_product",["id" =>3]));
+
+        } catch (RouteNotFoundException $e) {
             echo $e->getMessage();
-        }
-        catch (InvalidRouteArgumentException $e){
+        } catch (InvalidRouteNameException $e) {
+            echo $e->getMessage();
+        } catch (InvalidRouteArgumentException $e) {
             echo $e->getMessage();
         }
 
