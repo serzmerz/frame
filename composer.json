@@ -1,0 +1,18 @@
+{
+    "name": "serz/framework",
+    "description": "Framework",
+    "license": "MTI",
+    "authors": [
+        {
+            "name": "Sergey Tansky",
+            "email": "serzmerz@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "serz\\Framework\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
