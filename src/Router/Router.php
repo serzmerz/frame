@@ -3,9 +3,11 @@
 namespace serz\Framework\Router;
 
 use serz\Framework\Request\Request;
-use serz\Framework\Router\Exceptions\InvalidRouteArgumentException;
-use serz\Framework\Router\Exceptions\InvalidRouteNameException;
-use serz\Framework\Router\Exceptions\RouteNotFoundException;
+use serz\Framework\Router\Exceptions\{
+    InvalidRouteArgumentException,
+    InvalidRouteNameException,
+    RouteNotFoundException
+};
 
 
 /**
