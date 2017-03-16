@@ -3,6 +3,8 @@
 
 namespace serz\Framework\Request;
 
+use serz\Framework\Request\Exceptions\InvalidQueryKeyException;
+
 
 /**
  * Class Request
@@ -78,6 +80,20 @@ class Request
         }
 
         return $array_variable;
+    }
+
+    /**
+     * get param on key
+     * @param string $key
+     * @return string
+     * @throws InvalidQueryKeyException
+     */
+    public function getParamQuery(string $key): string
+    {
+        $result = $this->getQueryString();
+        if (array_key_exists($key, $result))
+            return $result[$key];
+        else throw new InvalidQueryKeyException("This params is not valid!");
     }
 
 }

@@ -12,7 +12,7 @@ class Route
 
     private $controllerAction;
 
-    private $variables;
+    private $variables = [];
 
     /**
      * Route constructor.

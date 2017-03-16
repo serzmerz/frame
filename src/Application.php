@@ -2,6 +2,7 @@
 
 namespace serz\Framework;
 
+use serz\Framework\Request\Exceptions\InvalidQueryKeyException;
 use serz\Framework\Request\Request;
 use serz\Framework\Response\Response;
 use serz\Framework\Router\Router;
@@ -47,6 +48,27 @@ class Application
 
             $route = $router->getRoute($request);
 
+            $route_controller = $route->getControllerName();
+            $route_action = $route->getControllerAction();
+
+            if (class_exists($route_controller)) {
+
+                $reflectionClass = new \ReflectionClass($route_controller);
+
+                if ($reflectionClass->hasMethod($route_action)) {
+
+                    $controller = $reflectionClass->newInstanceArgs(array($this->config["path_to_views"]));
+                    $reflectionMethod = $reflectionClass->getMethod($route_action);
+                    $response = $reflectionMethod->invokeArgs($controller, $route->getVariables());
+
+                    if ($response instanceof Response) {
+                        $response->send();
+                    }
+                }
+            }
+
+            // debug($request->getQueryString());
+            // debug($request->getParamQuery("c"));
             // debug($router->getLink("single_product",["id" =>3]));
 
         } catch (RouteNotFoundException $e) {
@@ -55,7 +77,10 @@ class Application
             echo $e->getMessage();
         } catch (InvalidRouteArgumentException $e) {
             echo $e->getMessage();
+        } catch (InvalidQueryKeyException $e) {
+            echo $e->getMessage();
         }
+
 
     }
 
