@@ -1,9 +1,9 @@
 <?php
 
-namespace serz\Framework\Router;
+namespace Serz\Framework\Router;
 
-use serz\Framework\Request\Request;
-use serz\Framework\Router\Exceptions\{
+use Serz\Framework\Request\Request;
+use Serz\Framework\Router\Exceptions\{
     InvalidRouteArgumentException,
     InvalidRouteNameException,
     RouteNotFoundException

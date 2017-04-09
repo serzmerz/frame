@@ -1,9 +1,9 @@
 <?php
 
-namespace serz\Framework\Controller;
+namespace Serz\Framework\Controller;
 
 
-use serz\Framework\Response\Response;
+use Serz\Framework\Response\Response;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
@@ -31,7 +31,6 @@ class Controller
      */
     public function render(string $name, array $params)
     {
-        $result = new Response($this->twig->render($name, $params));
-        $result->send();
+        return new Response($this->twig->render($name, $params));
     }
 }

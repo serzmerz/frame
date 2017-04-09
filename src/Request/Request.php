@@ -1,9 +1,9 @@
 <?php
 
 
-namespace serz\Framework\Request;
+namespace Serz\Framework\Request;
 
-use serz\Framework\Request\Exceptions\InvalidQueryKeyException;
+use Serz\Framework\Request\Exceptions\InvalidQueryKeyException;
 
 
 /**
@@ -18,6 +18,16 @@ class Request
      * @var null
      */
     private static $request = null;
+
+    /**
+     * @var array collection of HTTP headers
+     */
+    private $headers;
+
+    /**
+     * @var body raw request
+     */
+    private $rawBody;
 
     /**
      * Request constructor.
@@ -94,6 +104,41 @@ class Request
         if (array_key_exists($key, $result))
             return $result[$key];
         else throw new InvalidQueryKeyException("This params is not valid!");
+    }
+
+
+    /**
+     * Returns the header collection.
+     * The header collection contains incoming HTTP headers.
+     * @return array HeaderCollection the header collection
+     */
+    public function getHeaders(): array
+    {
+        if ($this->headers === null) {
+            foreach ($_SERVER as $name => $value) {
+                if (strncmp($name, 'HTTP_', 5) === 0) {
+                    $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                    $this->headers[$name] = $value;
+                }
+            }
+
+            return $this->headers;
+        }
+
+        return $this->headers;
+    }
+
+    /**
+     * Returns the raw HTTP request body.
+     * @return string the request body
+     */
+    public function getRawBody(): string
+    {
+        if ($this->rawBody === null) {
+            $this->rawBody = file_get_contents('php://input');
+        }
+
+        return $this->rawBody;
     }
 
 }

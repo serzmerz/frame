@@ -1,6 +1,6 @@
 <?php
 
-namespace serz\Framework\Response;
+namespace Serz\Framework\Response;
 
 class JsonResponse extends Response
 {

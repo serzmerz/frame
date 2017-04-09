@@ -1,6 +1,6 @@
 <?php
 
-namespace serz\Framework\Router;
+namespace Serz\Framework\Router;
 
 
 class Route

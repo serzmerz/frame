@@ -1,6 +1,6 @@
 <?php
 
-namespace serz\Framework\Router\Exceptions;
+namespace Serz\Framework\Router\Exceptions;
 
 
 class RouteNotFoundException extends \Exception

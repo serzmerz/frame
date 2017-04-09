@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "serz\\Framework\\": "src/"
+            "Serz\\Framework\\": "src/"
         }
     },
     "minimum-stability": "dev",
