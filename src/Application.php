@@ -2,10 +2,12 @@
 
 namespace Serz\Framework;
 
+use Serz\Framework\Middleware\MiddlewareRunner;
 use Serz\Framework\Exceptions\{
     GetNoResponseClassException,
     RouteActionNotFoundException,
-    RouteClassNotFoundException};
+    RouteClassNotFoundException
+};
 use Serz\Framework\Request\Exceptions\InvalidQueryKeyException;
 use Serz\Framework\Request\Request;
 use Serz\Framework\Response\Response;
@@ -47,12 +49,9 @@ class Application
     {
         try {
 
-            $router = new Router($this->config['routes']);
-
+            $router = new Router($this->config);
             $route = $router->getRoute(Request::getRequest());
-
             $this->makeRoute($route);
-
 
         } catch (RouteNotFoundException $e) {
             echo $e->getMessage();
@@ -65,7 +64,6 @@ class Application
         } catch (GetNoResponseClassException $e) {
             echo $e->getMessage();
         }
-
 
     }
 
@@ -90,7 +88,13 @@ class Application
 
                 $controller = $reflectionClass->newInstanceArgs(array($this->config["path_to_views"]));
                 $reflectionMethod = $reflectionClass->getMethod($route_action);
-                $response = $reflectionMethod->invokeArgs($controller, $route->getVariables());
+                $responsePrepare = $reflectionMethod->invokeArgs($controller, $route->getVariables());
+
+                $middlewareRunner = new MiddlewareRunner(
+                    $this->config["middleware"],
+                    $route, $responsePrepare);
+
+                $response = $middlewareRunner->runMiddlewares();
 
                 if ($response instanceof Response) {
                     $response->send();

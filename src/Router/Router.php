@@ -2,6 +2,7 @@
 
 namespace Serz\Framework\Router;
 
+use Serz\Framework\Middleware\MiddlewareRunner;
 use Serz\Framework\Request\Request;
 use Serz\Framework\Router\Exceptions\{
     InvalidRouteArgumentException,
@@ -24,13 +25,14 @@ class Router
      */
     public $routes = [];
 
+    //public $middlewarePaths;
     /**
      * Router constructor.
      * @param array $config
      */
     public function __construct(array $config)
     {
-        foreach ($config as $key => $value) {
+        foreach ($config["routes"] as $key => $value) {
 
             $existed_params = $this->getParams($value);
             $this->routes[$key] = [
@@ -39,11 +41,12 @@ class Router
                 "controller_name" => $this->getRouteController($value),
                 "controller_action" => $this->getRouteMethod($value),
                 "regexp" => $this->getRegExp($value, $existed_params),
-                "params" => $existed_params
+                "params" => $existed_params,
+                "middleware" => isset($value["middleware"]) ? $this->getMiddlewares($value["middleware"]) : null
             ];
 
         }
-        debug($this->routes);
+        //debug($this->routes);
     }
 
     /**
@@ -61,7 +64,7 @@ class Router
             if ($value['method'] == $request->getMethod()) {
                 if (preg_match_all($value['regexp'], $uri, $matches)) {
 
-                    $result = new Route($key, $value['controller_name'], $value['controller_action']);
+                    $result = new Route($key, $value['controller_name'], $value['controller_action'], $value['middleware']);
 
                     if (!empty($value['params'])) {
 
@@ -165,5 +168,23 @@ class Router
         }
 
         return $result;
+    }
+
+    /**
+     * return array middlewares with params
+     * @param string $value
+     * @return array
+     */
+    public function getMiddlewares(string $value): array
+    {
+        $middlewares = [];
+
+        foreach ($value as $item) {
+
+            $buf = explode(":", $item);
+            $middlewares[array_shift($buf)] = explode(',', array_pop($buf));
+
+        }
+        return $middlewares;
     }
 }
