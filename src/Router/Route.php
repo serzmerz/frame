@@ -13,18 +13,28 @@ class Route
     private $controllerAction;
 
     private $variables = [];
+    
+    public $middleware = [];
 
+    /**
+     * @return array
+     */
+    public function getMiddleware(): array
+    {
+        return $this->middleware;
+    }
     /**
      * Route constructor.
      * @param $name
      * @param $controllerName
      * @param $controllerAction
      */
-    public function __construct(string $name, string $controllerName, string $controllerAction)
+    public function __construct(string $name, string $controllerName, string $controllerAction, array $middleware)
     {
         $this->name = $name;
         $this->controllerName = $controllerName;
         $this->controllerAction = $controllerAction;
+        $this->middleware = $middleware;
     }
 
     /**

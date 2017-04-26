@@ -106,7 +106,6 @@ class Request
         else throw new InvalidQueryKeyException("This params is not valid!");
     }
 
-
     /**
      * Returns the header collection.
      * The header collection contains incoming HTTP headers.
