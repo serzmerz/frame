@@ -2,7 +2,6 @@
 
 namespace Serz\Framework\Router;
 
-use Serz\Framework\Middleware\MiddlewareRunner;
 use Serz\Framework\Request\Request;
 use Serz\Framework\Router\Exceptions\{
     InvalidRouteArgumentException,
@@ -42,7 +41,8 @@ class Router
                 "controller_action" => $this->getRouteMethod($value),
                 "regexp" => $this->getRegExp($value, $existed_params),
                 "params" => $existed_params,
-                "middleware" => isset($value["middleware"]) ? $this->getMiddlewares($value["middleware"]) : null
+                "middleware" => isset($value["middleware"]) ?
+                    $this->getMiddlewares($value["middleware"]) : []
             ];
 
         }
@@ -175,7 +175,7 @@ class Router
      * @param string $value
      * @return array
      */
-    public function getMiddlewares(string $value): array
+    public function getMiddlewares(array $value): array
     {
         $middlewares = [];
 

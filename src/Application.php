@@ -4,9 +4,7 @@ namespace Serz\Framework;
 
 use Serz\Framework\Middleware\MiddlewareRunner;
 use Serz\Framework\Exceptions\{
-    GetNoResponseClassException,
-    RouteActionNotFoundException,
-    RouteClassNotFoundException
+    AllMiddlewareNotRunException, GetNoResponseClassException, RouteActionNotFoundException, RouteClassNotFoundException
 };
 use Serz\Framework\Request\Exceptions\InvalidQueryKeyException;
 use Serz\Framework\Request\Request;
@@ -88,14 +86,15 @@ class Application
 
                 $controller = $reflectionClass->newInstanceArgs(array($this->config["path_to_views"]));
                 $reflectionMethod = $reflectionClass->getMethod($route_action);
-                $responsePrepare = $reflectionMethod->invokeArgs($controller, $route->getVariables());
 
                 $middlewareRunner = new MiddlewareRunner(
                     $this->config["middleware"],
-                    $route, $responsePrepare);
+                    $route);
 
-                $response = $middlewareRunner->runMiddlewares();
-
+                $middlewareResponse = $middlewareRunner->runMiddlewares();
+                if($middlewareResponse)
+                    $response = $reflectionMethod->invokeArgs($controller, $route->getVariables());
+                else throw new AllMiddlewareNotRunException("Forbidden!");
                 if ($response instanceof Response) {
                     $response->send();
                 } else throw new GetNoResponseClassException("Get no response class!");

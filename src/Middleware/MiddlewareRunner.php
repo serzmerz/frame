@@ -2,9 +2,6 @@
 
 namespace Serz\Framework\Middleware;
 
-use Mystore\Middleware\CheckMiddleware;
-use Mystore\Middleware\IsAdminMiddleware;
-use Mystore\Middleware\OldMiddleware;
 use Serz\Framework\Request\Request;
 use Serz\Framework\Response\JsonResponse;
 use Serz\Framework\Response\Response;
@@ -29,30 +26,30 @@ class MiddlewareRunner
     public $middlewaresVariables = [];
 
     /**
-     * @var response class
-     */
-    public $response;
-
-    /**
      * MiddlewareRunner constructor.
      */
-    public function __construct(array $config, Route $route, Response $response)
+    public function __construct(array $config, Route $route)
     {
         $middlewareVariables = $route->getMiddleware();
+        if(empty($middlewareVariables)){
 
-        foreach ($config as $key => $item) {
-            if (array_key_exists($key, $middlewareVariables)) {
-                $check[$key] = $middlewareVariables[$key];
+        }
+        else {
+            foreach ($config as $key => $item) {
+                if (array_key_exists($key, $middlewareVariables)) {
+                    $check[$key] = $middlewareVariables[$key];
+                }
+            }
+
+            foreach ($config as $key => $value) {
+                if (array_key_exists($key, $check)) {
+                    $this->middlewares[$key] = $value;
+                    $this->middlewaresVariables[$key] = $check[$key];
+                }
             }
         }
 
-        foreach ($config as $key => $value) {
-            if (array_key_exists($key, $check)) {
-                $this->middlewares[$key] = $value;
-                $this->middlewaresVariables[$key] = $check[$key];
-            }
-        }
-        $this->response = $response;
+
     }
 
     /**
@@ -76,21 +73,20 @@ class MiddlewareRunner
      * Run all sequence middlewares
      * @return Response
      */
-    public function runMiddlewares(): Response
+    public function runMiddlewares()
     {
 
         $request = Request::getRequest();
 
         $lastNext = function ($request) {
-            return $this->response;
+            return true;
         };
 
         foreach (array_reverse($this->middlewares) as $key => $value) {
-            $nextClosure = $this->buildClosure($value, $lastNext, $this->middlewaresVariables[$key]);
-            $lastNext = $nextClosure;
+            $lastNext =  $this->buildClosure($value, $lastNext, $this->middlewaresVariables[$key]);
         }
 
-        $response = $nextClosure($request);
+        $response = $lastNext($request);
         return $response;
     }
 }

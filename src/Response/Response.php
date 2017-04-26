@@ -75,7 +75,7 @@ class Response
     private function sendHeaders()
     {
         header($_SERVER['SERVER_PROTOCOL'] . " " . $this->code . " " . self::CODE_STATUS[$this->code]);
-        if (empty($this->headers)) {
+        if (!empty($this->headers)) {
             foreach ($this->headers as $key => $value) {
                 header($key . ": " . $value);
             }
