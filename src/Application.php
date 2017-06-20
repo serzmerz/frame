@@ -2,6 +2,8 @@
 
 namespace Serz\Framework;
 
+use Serz\Framework\DI\Conteiner;
+use Serz\Framework\DI\Injector;
 use Serz\Framework\Middleware\MiddlewareRunner;
 use Serz\Framework\Exceptions\{
     AllMiddlewareNotRunException, GetNoResponseClassException, RouteActionNotFoundException, RouteClassNotFoundException
@@ -26,18 +28,14 @@ class Application
 {
 
     /**
-     * @var array
-     * config routes
-     */
-    public $config = [];
-
-    /**
      * Application constructor.
      * @param array $config
      */
     public function __construct(array $config)
     {
-        $this->config = $config;
+        Conteiner::set("config", $config);
+        Conteiner::set("request", Request::getRequest());
+        Injector::getInstance();
     }
 
     /**
@@ -46,9 +44,10 @@ class Application
     public function start()
     {
         try {
-
-            $router = new Router($this->config);
-            $route = $router->getRoute(Request::getRequest());
+            //$router = new Router($this->config);
+            Injector::define(Router::class, [':config' => Conteiner::get("config")]);
+            $router = Injector::make(Router::class);
+            $route = $router->getRoute(Conteiner::get("request"));
             $this->makeRoute($route);
 
         } catch (RouteNotFoundException $e) {
@@ -84,11 +83,11 @@ class Application
 
             if ($reflectionClass->hasMethod($route_action)) {
 
-                $controller = $reflectionClass->newInstanceArgs(array($this->config["path_to_views"]));
+                $controller = $reflectionClass->newInstanceArgs(array(Conteiner::get("config")["path_to_views"]));
                 $reflectionMethod = $reflectionClass->getMethod($route_action);
 
                 $middlewareRunner = new MiddlewareRunner(
-                    $this->config["middleware"],
+                    Conteiner::get("config")["middleware"],
                     $route);
 
                 $middlewareResponse = $middlewareRunner->runMiddlewares();

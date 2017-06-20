@@ -15,6 +15,7 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "rdlowrey/auryn": "dev-master"
+        "rdlowrey/auryn": "dev-master",
+        "usmanhalalit/pixie": "2.*@dev"
     }
 }
