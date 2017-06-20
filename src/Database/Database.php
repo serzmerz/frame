@@ -6,6 +6,7 @@ namespace Serz\Framework\Database;
 
 use Pixie\Connection;
 use Pixie\QueryBuilder\QueryBuilderHandler;
+use Serz\Framework\DI\Conteiner;
 
 /**
  * Class Database
@@ -36,9 +37,9 @@ class Database
      * @param $conection
      * @param $queryBuilder
      */
-    public function __construct(array $config)
+    public function __construct()
     {
-        $this->config = $config;
+        $this->config = Conteiner::get("config")["db"];
         $this->conection = new Connection('pgsql', $this->config);
         $this->qb = new QueryBuilderHandler($this->conection);
     }
